@@ -1,31 +1,42 @@
 package pl.bykowski.spring_secutity_homework2.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.bykowski.spring_secutity_homework2.services.MessageConstructor;
 
 import java.security.Principal;
 
 @RestController
 public class TestController {
 
-    @GetMapping("/forAll")
-    public String forAll() {
-        return "everyone have acess here";
-    }
+    private MessageConstructor messageConstructor;
 
-    @GetMapping("/forUser")
-    public String forUser(Principal principal) {
-        return "Hello user: " + principal.getName();
+    @Autowired
+    public TestController(MessageConstructor messageConstructor) {
+        this.messageConstructor = messageConstructor;
     }
 
     @GetMapping("/forAdmin")
-    public String forAdmin(Principal principal) {
-        return "Hello admin: " + principal.getName();
+    public ResponseEntity<String> getAdmin(Principal principal) {
+        return new ResponseEntity<>(messageConstructor.getMessageForAdmin(principal), HttpStatus.OK);
+    }
+
+    @GetMapping("/forUser")
+    public ResponseEntity<String> getUser(Principal principal) {
+        return new ResponseEntity<>(messageConstructor.getMessageForUser(principal), HttpStatus.OK);
+    }
+
+    @GetMapping("/forAll")
+    public ResponseEntity<String> forAll(Principal principal) {
+        return new ResponseEntity<>(messageConstructor.getMessageForUserDependentByRole(principal), HttpStatus.OK);
     }
 
     @GetMapping("/bye")
-    public String getBye(Principal principal) {
-        return "papa";
+    public ResponseEntity<String> getBye() {
+        return new ResponseEntity<>("papa", HttpStatus.OK);
     }
 
 }
